@@ -239,8 +239,13 @@ function friendlyError(err) {
   if (/ENOENT|not found|command.*claude/i.test(msg)) {
     return 'Claude Code was not found on this computer. Fix: open Terminal, run "npm install -g @anthropic-ai/claude-code", then run "claude" once and sign in.';
   }
-  if (/auth|login|credential|401|unauthorized/i.test(msg)) {
-    return 'Claude is not signed in. Fix: open Terminal, type "claude", and log in once. Then try again here.';
+  if (/auth|login|credential|oauth|session expired|401|unauthorized/i.test(msg)) {
+    return 'Your Claude login has expired. Fix: open Terminal, type "claude", press Enter, and sign in again. Then come back and retry — nothing here is lost.';
+  }
+  // The SDK reports an expired login only as a bare non-zero exit, so name the
+  // most likely cause rather than showing a meaningless code.
+  if (/exited with code|process (?:failed|exited)/i.test(msg)) {
+    return 'Claude couldn\'t start — usually this means your login has expired. Fix: open Terminal, type "claude", press Enter, and sign in again. Then retry here.';
   }
   if (/JSON|parse/i.test(msg)) {
     return 'Claude replied in an unexpected format. This happens occasionally — just click the button again.';
