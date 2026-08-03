@@ -3,19 +3,64 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
-import { DEFAULT_BRAND_RULES, buildIdeasPrompt, buildPostsPrompt } from './prompts.js';
+import {
+  DEFAULT_RULES, MARKETS,
+  buildIdeasPrompt, buildPostsPrompt, buildReplyPrompt,
+  buildXIdeasPrompt, buildXPostPrompt, buildReactPrompt,
+} from './prompts.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = path.join(__dirname, 'data');
 const PORT = process.env.PORT || 3999;
 const MOCK = process.env.MOCK_CLAUDE === '1';
 
-// ---------- JSON file storage ----------
+// ---------- JSON file storage (partitioned per market) ----------
 
-fs.mkdirSync(DATA_DIR, { recursive: true });
+// Only ever accept a known market — this value becomes part of a file path.
+function safeMarket(value) {
+  return MARKETS.includes(value) ? value : null;
+}
 
-function readJson(name, fallback) {
-  const file = path.join(DATA_DIR, name);
+for (const m of MARKETS) fs.mkdirSync(path.join(DATA_DIR, m), { recursive: true });
+
+// One-time migration: the app used to be India-only with files sitting directly
+// in data/. Move them into data/india/ so nothing is lost.
+(function migrateLegacyData() {
+  for (const name of ['content_history.json', 'settings.json']) {
+    const legacy = path.join(DATA_DIR, name);
+    const target = path.join(DATA_DIR, 'india', name);
+    if (fs.existsSync(legacy) && !fs.existsSync(target)) {
+      fs.copyFileSync(legacy, target);
+      fs.renameSync(legacy, legacy + '.migrated');
+      if (fs.existsSync(legacy + '.bak')) {
+        fs.copyFileSync(legacy + '.bak', target + '.bak');
+      }
+      console.log(`Migrated ${name} -> data/india/${name}`);
+    }
+  }
+  // Saved rules from before the market split have no MARKET FOCUS section, so they
+  // would leave the writer with no length / posting-time / hashtag instructions.
+  // Upgrade them to this market's defaults (the previous file is kept as .bak).
+  for (const m of MARKETS) {
+    const file = path.join(DATA_DIR, m, 'settings.json');
+    if (!fs.existsSync(file)) continue;
+    try {
+      const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
+      if (!String(saved.brandRules || '').includes('MARKET FOCUS')) {
+        const tmp = file + '.tmp';
+        fs.copyFileSync(file, file + '.bak');
+        fs.writeFileSync(tmp, JSON.stringify({ brandRules: DEFAULT_RULES[m] }, null, 2));
+        fs.renameSync(tmp, file);
+        console.log(`Upgraded ${m} settings to the new market-aware rules`);
+      }
+    } catch {
+      /* unreadable settings just fall back to defaults on read */
+    }
+  }
+})();
+
+function readJson(market, name, fallback) {
+  const file = path.join(DATA_DIR, market, name);
   try {
     return JSON.parse(fs.readFileSync(file, 'utf8'));
   } catch {
@@ -23,8 +68,8 @@ function readJson(name, fallback) {
   }
 }
 
-function writeJson(name, value) {
-  const file = path.join(DATA_DIR, name);
+function writeJson(market, name, value) {
+  const file = path.join(DATA_DIR, market, name);
   const tmp = file + '.tmp';
   // keep a backup of the previous version so history is never silently lost
   if (fs.existsSync(file)) fs.copyFileSync(file, file + '.bak');
@@ -32,13 +77,14 @@ function writeJson(name, value) {
   fs.renameSync(tmp, file);
 }
 
-const history = () => readJson('content_history.json', { entries: [] });
+const history = (market) => readJson(market, 'content_history.json', { entries: [] });
 
 // Build a taste profile from what the user actually posted (not just drafted).
 // Engagement metrics, when logged, promote a post to "top performer".
-function buildTasteProfile(h) {
+function buildTasteProfile(h, market) {
   const posted = h.entries.filter((e) => e.status === 'posted').slice(-30);
   if (posted.length < 2) return ''; // not enough signal yet
+  const isX = market === 'x';
   const lines = [];
 
   const catCounts = {};
@@ -48,43 +94,100 @@ function buildTasteProfile(h) {
   lines.push('Topics the author chose to post:');
   for (const e of posted.slice(-10)) lines.push(`- ${e.topic}`);
 
+  // LinkedIn is judged on reach; X is judged on whether people argued back,
+  // which is what the ranker rewards and what separates respect from applause.
+  const score = (m = {}) => (isX
+    ? 5 * (m.replies || 0) + 3 * (m.reposts || 0) + (m.likes || 0)
+    : (m.impressions || 0));
   const withMetrics = posted
-    .map((e) => ({ e, score: (e.metrics?.likes || 0) + 3 * (e.metrics?.comments || 0) }))
-    .filter((x) => x.score > 0)
-    .sort((a, b) => b.score - a.score);
+    .map((e) => ({ e, s: score(e.metrics), eng: (e.metrics?.likes || 0) + 3 * (e.metrics?.comments || 0) }))
+    .filter((x) => x.s > 0 || x.eng > 0)
+    .sort((a, b) => b.s - a.s || b.eng - a.eng);
+
   if (withMetrics.length) {
-    lines.push('Best-performing posts (highest engagement — lean toward this style):');
+    lines.push(isX
+      ? 'TOP-PERFORMING POSTS — these earned the most REPLIES and REPOSTS, i.e. people had something to say back. Match this calibre of specificity and arguability:'
+      : 'TOP-PERFORMING POSTS — these got the most REACH. Study them and match this exact style, specificity, and angle. Aim for the same calibre:');
     for (const { e } of withMetrics.slice(0, 5)) {
-      const firstLine = (e.drafts?.linkedin || '').split('\n')[0];
-      lines.push(`- "${e.topic}" (likes: ${e.metrics?.likes || 0}, comments: ${e.metrics?.comments || 0})${firstLine ? ` — opened with: "${firstLine}"` : ''}`);
+      const m = e.metrics || {};
+      const first = (isX ? (e.drafts?.post || '') : (e.drafts?.linkedin || '')).split('\n')[0];
+      const bits = (isX
+        ? [m.views ? `${m.views.toLocaleString('en-US')} views` : '', m.replies ? `${m.replies} replies` : '', m.reposts ? `${m.reposts} reposts` : '', m.likes ? `${m.likes} likes` : '']
+        : [m.impressions ? `${m.impressions.toLocaleString('en-US')} impressions` : '', m.likes ? `${m.likes} likes` : '', m.comments ? `${m.comments} comments` : '']
+      ).filter(Boolean).join(', ');
+      const who = isX && e.notes ? ` — engaged by: ${e.notes}` : '';
+      lines.push(`- "${e.topic}"${bits ? ` (${bits})` : ''}${first ? ` — opened: "${first}"` : ''}${who}`);
     }
   }
   return lines.join('\n');
 }
-const settings = () => readJson('settings.json', { brandRules: DEFAULT_BRAND_RULES });
+const settings = (market) =>
+  readJson(market, 'settings.json', { brandRules: DEFAULT_RULES[market] });
 
 // ---------- Claude wrapper ----------
 
-const MOCK_IDEAS = {
-  ideas: Array.from({ length: 5 }, (_, i) => ({
-    topic: `Mock idea ${i + 1}: why AI product evals matter`,
-    category: ['ai-products', 'product-thinking', 'user-research', 'startup-execution', 'other'][i],
+const mockIdeas = (market) => ({
+  ideas: Array.from({ length: market === 'x' ? 10 : 8 }, (_, i) => ({
+    topic:
+      market === 'x'
+        ? `Mock X idea ${i + 1}: the detail everyone missed in yesterday's model release`
+        : market === 'global'
+          ? `Mock global idea ${i + 1}: a small Notion default worth noticing`
+          : `Mock India idea ${i + 1}: a small Swiggy default worth noticing`,
+    category: market === 'x'
+      ? ['ai-launch', 'product-launch', 'product-insight', 'founder-observation', 'prediction'][i % 5]
+      : ['ai-products', 'product-thinking', 'user-research', 'startup-execution', 'other'][i % 5],
     whyItMatters: 'This is fixture data for testing the UI without calling Claude.',
+    newsDate: '2 days ago',
+    timeliness: 8,
     scores: { originality: 8, engagement: 7, brandAlignment: 9, longTermValue: 8 },
     sources: [{ title: 'Hacker News', url: 'https://news.ycombinator.com' }],
   })),
+});
+
+const MOCK_X_POST = {
+  post: 'Mock X post for testing.\n\nOne idea, no hashtags, no emoji — roughly 90-150 words in a real run.',
+  mode: 'take',
+  receipt: 'Screenshot of the pricing table on the announcement page (the per-token row).',
+  hooks: ['Mock X hook one.', 'Mock X hook two.', 'Mock X hook three.'],
+  followUp: 'Mock one-line follow-up if this takes off.',
+  replies: ['R1', 'R2', 'R3', 'R4', 'R5'],
+  linkPlan: 'none',
+  sources: [{ title: 'Hacker News', url: 'https://news.ycombinator.com' }],
+  timeliness: 8,
+  postWithin: 'next 3 hours',
 };
 
-const MOCK_POSTS = {
-  linkedin: 'Most teams treat AI evals as a launch checklist item.\n\nThe better framing: evals are your product spec. (Mock draft for testing — about 200 words in a real run.)',
-  x: 'Your AI eval suite is your real product spec. Everything else is commentary.',
-  hooks: ['Most teams get evals backwards.', 'Your eval suite is your product spec.', 'Stop treating evals as QA.'],
-  comments: ['Great point about X.', 'This matches what I have seen with Y.', 'One nuance to add...', 'How does this apply to Z?', 'The second-order effect here is interesting.'],
-  bestPostingTime: 'Tuesday 9:00 AM IST',
-  score: 88,
-  scoreBreakdown: { originality: 88, authority: 90, clarity: 92, discussionPotential: 85, shareability: 84, longTermBrandValue: 89 },
-  rewritten: false,
-};
+const mockPosts = (market) =>
+  market === 'x'
+    ? MOCK_X_POST
+    : market === 'global'
+    ? {
+        linkedin:
+          'Mock global draft for testing.\n\nRuns longer than the India format — roughly 220-340 words in a real run.',
+        x: 'Mock global X post for testing.',
+        hooks: ['Mock global hook one.', 'Mock global hook two.', 'Mock global hook three.'],
+        comments: ['C1', 'C2', 'C3', 'C4', 'C5'],
+        bestPostingTime: 'Wednesday 9:00 AM ET (2:00 PM UK)',
+        hashtags: ['#ProductManagement', '#ProductThinking', '#UX', '#ProductDesign'],
+        score: 88,
+        scoreBreakdown: { originality: 88, authority: 90, clarity: 92, discussionPotential: 85, shareability: 84, longTermBrandValue: 89 },
+        rewritten: false,
+      }
+    : {
+        linkedin:
+          'Mock India draft for testing.\n\nShort and punchy — roughly 100-160 words in a real run.',
+        x: 'Mock India X post for testing.',
+        hooks: ['Mock India hook one.', 'Mock India hook two.', 'Mock India hook three.'],
+        comments: ['C1', 'C2', 'C3', 'C4', 'C5'],
+        bestPostingTime: 'Tuesday 9:00 AM IST',
+        hashtags: ['#ProductManagement', '#ProductThinking', '#UX', '#BuildingForBharat'],
+        score: 88,
+        scoreBreakdown: { originality: 88, authority: 90, clarity: 92, discussionPotential: 85, shareability: 84, longTermBrandValue: 89 },
+        rewritten: false,
+      };
+
+const MOCK_REPLY = { answer: 'Honestly the timing helped, but the core idea still holds if the reward is real.', agree: 'Yeah, exactly this.' };
 
 function extractJson(text) {
   const cleaned = text.replace(/```(?:json)?/g, '').trim();
@@ -131,6 +234,7 @@ async function runClaude(prompt, { allowWebSearch = false, onProgress = () => {}
 }
 
 function friendlyError(err) {
+  if (err?.friendly) return err.friendly;
   const msg = String(err?.message || err);
   if (/ENOENT|not found|command.*claude/i.test(msg)) {
     return 'Claude Code was not found on this computer. Fix: open Terminal, run "npm install -g @anthropic-ai/claude-code", then run "claude" once and sign in.';
@@ -154,6 +258,11 @@ let activeJob = null;
 
 function sseHandler(buildPromptAndRun) {
   return async (req, res) => {
+    const market = safeMarket(req.query.market);
+    if (!market) {
+      res.status(400).json({ error: 'Pick a market first (Indian or Global).' });
+      return;
+    }
     if (activeJob) {
       res.status(409).json({ error: 'A generation is already running. Wait for it to finish, then try again.' });
       return;
@@ -167,7 +276,7 @@ function sseHandler(buildPromptAndRun) {
     const send = (event, data) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
     const heartbeat = setInterval(() => res.write(': ping\n\n'), 15000);
     try {
-      const result = await buildPromptAndRun((msg) => send('progress', { message: msg }));
+      const result = await buildPromptAndRun((msg) => send('progress', { message: msg }), market);
       send('done', result);
     } catch (err) {
       send('failed', { error: friendlyError(err) });
@@ -186,18 +295,29 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Step 1: research ideas (SSE via GET so EventSource works directly)
-app.get('/api/ideas', sseHandler(async (onProgress) => {
+app.get('/api/ideas', sseHandler(async (onProgress, market) => {
   onProgress('Reading your post history...');
-  const h = history();
+  const h = history(market);
   const recentTopics = h.entries.slice(-20).map((e) => e.topic);
+  const taste = buildTasteProfile(h, market);
+
+  if (market === 'x') {
+    onProgress('Scanning AI launches, changelogs, HN, r/LocalLLaMA...');
+    const today = new Date().toISOString().slice(0, 10);
+    const prompt = buildXIdeasPrompt(settings(market).brandRules, recentTopics, taste, today);
+    const result = await runClaude(prompt, { allowWebSearch: true, onProgress, mockResult: mockIdeas(market) });
+    if (!Array.isArray(result?.ideas) || result.ideas.length === 0) throw new Error('JSON missing ideas');
+    return { ideas: result.ideas, generatedAt: new Date().toISOString() };
+  }
+
   const counts = {};
   for (const e of h.entries.slice(-20)) counts[e.category] = (counts[e.category] || 0) + 1;
   const countsStr = Object.entries(counts).map(([k, v]) => `${k}: ${v}`).join(', ');
   onProgress('Starting research across HN, Reddit, X, Product Hunt, tech blogs...');
-  const prompt = buildIdeasPrompt(settings().brandRules, recentTopics, countsStr, buildTasteProfile(h));
-  const result = await runClaude(prompt, { allowWebSearch: true, onProgress, mockResult: MOCK_IDEAS });
+  const prompt = buildIdeasPrompt(settings(market).brandRules, recentTopics, countsStr, taste);
+  const result = await runClaude(prompt, { allowWebSearch: true, onProgress, mockResult: mockIdeas(market) });
   if (!Array.isArray(result?.ideas) || result.ideas.length === 0) throw new Error('JSON missing ideas');
-  return result;
+  return { ideas: result.ideas, generatedAt: new Date().toISOString() };
 }));
 
 // Step 2: write posts for the chosen idea.
@@ -205,45 +325,154 @@ app.get('/api/ideas', sseHandler(async (onProgress) => {
 let pendingIdea = null;
 
 app.post('/api/posts/start', (req, res) => {
-  // stash the idea for the SSE call that follows
-  pendingIdea = req.body?.idea;
-  if (!pendingIdea?.topic) return res.status(400).json({ error: 'No idea selected.' });
+  const market = safeMarket(req.body?.market);
+  if (!market) return res.status(400).json({ error: 'Pick a market first.' });
+  const idea = req.body?.idea;
+  if (!idea?.topic) return res.status(400).json({ error: 'No idea selected.' });
+  // stash the idea (and any first-hand note) for the SSE call that follows
+  pendingIdea = { market, idea, observation: (req.body?.observation || '').trim() };
   res.json({ ok: true });
 });
 
-app.get('/api/posts/stream', sseHandler(async (onProgress) => {
-  const idea = pendingIdea;
-  pendingIdea = null;
-  if (!idea) throw new Error('missing idea');
-  onProgress(`Writing posts for: ${idea.topic}`);
-  const h = history();
-  const recentHooks = h.entries.slice(-5).map((e) => (e.drafts?.linkedin || '').split('\n')[0]).filter(Boolean);
-  const prompt = buildPostsPrompt(settings().brandRules, idea, recentHooks, buildTasteProfile(h));
-  const result = await runClaude(prompt, { allowWebSearch: false, onProgress, mockResult: MOCK_POSTS });
-  if (!result?.linkedin || !result?.x) throw new Error('JSON missing drafts');
+// Reject a draft when the model couldn't verify the central claim — including the
+// case where it writes its verification notes into the post body instead.
+function guardUnverified(result, bodyText) {
+  const looksLikeReport = /UNABLE TO VERIFY|cannot be (?:confirmed|verified)|accuracy requirement|RECOMMEND:/i.test(bodyText || '');
+  if (result?.unverified || looksLikeReport) {
+    const e = new Error('unverified');
+    e.friendly = `Couldn't confirm the key fact behind this, so I didn't write it up: ${result.reason || 'the main claim could not be verified from reliable sources.'} Pick a different idea — the others are fine.`;
+    throw e;
+  }
+}
 
+function saveEntry(market, { topic, category, idea, drafts }) {
   const entry = {
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
-    topic: idea.topic,
-    category: idea.category,
+    market,
+    topic,
+    category,
     idea,
-    drafts: result,
+    drafts,
     status: 'draft',
     metrics: {},
     notes: '',
   };
-  const hh = history();
-  hh.entries.push(entry);
-  writeJson('content_history.json', hh);
-  return { entry };
+  const h = history(market);
+  h.entries.push(entry);
+  writeJson(market, 'content_history.json', h);
+  return entry;
+}
+
+app.get('/api/posts/stream', sseHandler(async (onProgress, market) => {
+  const pending = pendingIdea;
+  pendingIdea = null;
+  if (!pending?.idea) throw new Error('missing idea');
+  if (pending.market !== market) throw new Error('missing idea');
+  const idea = pending.idea;
+  const h = history(market);
+  const taste = buildTasteProfile(h, market);
+
+  if (market === 'x') {
+    onProgress(`Checking the facts on: ${idea.topic}`);
+    const recentOpenings = h.entries.slice(-5).map((e) => (e.drafts?.post || '').split('\n')[0]).filter(Boolean);
+    const prompt = buildXPostPrompt(settings(market).brandRules, idea, recentOpenings, taste, pending.observation);
+    const result = await runClaude(prompt, { allowWebSearch: true, onProgress, mockResult: mockPosts(market) });
+    guardUnverified(result, result?.post);
+    if (!result?.post) throw new Error('JSON missing post');
+    return { entry: saveEntry(market, { topic: idea.topic, category: idea.category, idea, drafts: result }) };
+  }
+
+  onProgress(`Checking facts and writing posts for: ${idea.topic}`);
+  const recentHooks = h.entries.slice(-5).map((e) => (e.drafts?.linkedin || '').split('\n')[0]).filter(Boolean);
+  const prompt = buildPostsPrompt(settings(market).brandRules, idea, recentHooks, taste);
+  const result = await runClaude(prompt, { allowWebSearch: true, onProgress, mockResult: mockPosts(market) });
+  guardUnverified(result, result?.linkedin);
+  if (!result?.linkedin || !result?.x) throw new Error('JSON missing drafts');
+  return { entry: saveEntry(market, { topic: idea.topic, category: idea.category, idea, drafts: result }) };
 }));
 
+// X fast path: paste something you just saw, get a take.
+app.post('/api/react', async (req, res) => {
+  if (activeJob) return res.status(409).json({ error: 'Something is already generating. Wait a moment, then try again.' });
+  const market = safeMarket(req.body?.market);
+  if (market !== 'x') return res.status(400).json({ error: 'Quick takes are only for the X market.' });
+  const input = (req.body?.input || '').trim();
+  if (!input) return res.status(400).json({ error: 'Paste a link or headline first.' });
+  const observation = (req.body?.observation || '').trim();
+
+  activeJob = true;
+  try {
+    const h = history(market);
+    const prompt = buildReactPrompt(settings(market).brandRules, input, observation, buildTasteProfile(h, market));
+    const result = await runClaude(prompt, { allowWebSearch: true, mockResult: mockPosts(market) });
+    guardUnverified(result, result?.post);
+    if (!result?.post) throw new Error('JSON missing post');
+    const topic = input.length > 80 ? input.slice(0, 77) + '...' : input;
+    res.json({ entry: saveEntry(market, { topic, category: 'ai-launch', idea: { topic, sources: result.sources || [] }, drafts: result }) });
+  } catch (err) {
+    res.status(500).json({ error: friendlyError(err) });
+  } finally {
+    activeJob = false;
+  }
+});
+
+// Generate a short professional reply to a comment on a posted piece.
+app.post('/api/reply', async (req, res) => {
+  if (activeJob) return res.status(409).json({ error: 'Something is already generating. Wait a moment, then try again.' });
+  const market = safeMarket(req.body?.market);
+  if (!market) return res.status(400).json({ error: 'Pick a market first (Indian or Global).' });
+  const { entryId, comment } = req.body || {};
+  if (!comment || !comment.trim()) return res.status(400).json({ error: 'Please type the comment you want to reply to.' });
+  const entry = history(market).entries.find((e) => e.id === entryId);
+  const postText = entry?.drafts?.linkedin || '';
+  // Reply under the rules the post itself was written with.
+  const rulesMarket = safeMarket(entry?.market) || market;
+
+  // Rotate a style nudge so repeated clicks produce genuinely different replies.
+  const VARIANTS = [
+    'keep it warm and appreciative',
+    'reply with a short, curious question back',
+    'agree and add one quick fresh thought',
+    'be light and a little playful',
+    'be crisp and matter-of-fact',
+    'gently offer a slightly different angle',
+  ];
+  const variant = VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
+
+  activeJob = true;
+  try {
+    const prompt = buildReplyPrompt(settings(rulesMarket).brandRules, postText, comment.trim(), variant);
+    const result = await runClaude(prompt, { mockResult: MOCK_REPLY });
+    if (!result?.answer && !result?.agree) throw new Error('no reply generated');
+    res.json({ answer: result.answer || '', agree: result.agree || '' });
+  } catch (err) {
+    res.status(500).json({ error: friendlyError(err) });
+  } finally {
+    activeJob = false;
+  }
+});
+
+// Reject any request that didn't name a valid market.
+function requireMarket(req, res) {
+  const market = safeMarket(req.query.market ?? req.body?.market);
+  if (!market) {
+    res.status(400).json({ error: 'Pick a market first (Indian or Global).' });
+    return null;
+  }
+  return market;
+}
+
 // History
-app.get('/api/history', (req, res) => res.json(history()));
+app.get('/api/history', (req, res) => {
+  const market = requireMarket(req, res);
+  if (market) res.json(history(market));
+});
 
 app.patch('/api/history/:id', (req, res) => {
-  const h = history();
+  const market = requireMarket(req, res);
+  if (!market) return;
+  const h = history(market);
   const entry = h.entries.find((e) => e.id === req.params.id);
   if (!entry) return res.status(404).json({ error: 'Post not found.' });
   const { status, metrics, notes } = req.body || {};
@@ -253,32 +482,41 @@ app.patch('/api/history/:id', (req, res) => {
   }
   if (metrics) entry.metrics = { ...entry.metrics, ...metrics };
   if (notes !== undefined) entry.notes = notes;
-  writeJson('content_history.json', h);
+  writeJson(market, 'content_history.json', h);
   res.json(entry);
 });
 
 app.delete('/api/history/:id', (req, res) => {
-  const h = history();
+  const market = requireMarket(req, res);
+  if (!market) return;
+  const h = history(market);
   const idx = h.entries.findIndex((e) => e.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'Post not found.' });
   h.entries.splice(idx, 1);
-  writeJson('content_history.json', h);
+  writeJson(market, 'content_history.json', h);
   res.json({ ok: true });
 });
 
-// Settings
-app.get('/api/settings', (req, res) => res.json(settings()));
+// Settings — each market has its own independently editable rules.
+app.get('/api/settings', (req, res) => {
+  const market = requireMarket(req, res);
+  if (market) res.json(settings(market));
+});
 app.put('/api/settings', (req, res) => {
+  const market = requireMarket(req, res);
+  if (!market) return;
   const brandRules = req.body?.brandRules;
   if (typeof brandRules !== 'string' || !brandRules.trim()) {
     return res.status(400).json({ error: 'Brand rules cannot be empty.' });
   }
-  writeJson('settings.json', { brandRules });
+  writeJson(market, 'settings.json', { brandRules });
   res.json({ ok: true });
 });
 app.post('/api/settings/reset', (req, res) => {
-  writeJson('settings.json', { brandRules: DEFAULT_BRAND_RULES });
-  res.json({ brandRules: DEFAULT_BRAND_RULES });
+  const market = requireMarket(req, res);
+  if (!market) return;
+  writeJson(market, 'settings.json', { brandRules: DEFAULT_RULES[market] });
+  res.json({ brandRules: DEFAULT_RULES[market] });
 });
 
 app.listen(PORT, '127.0.0.1', () => {

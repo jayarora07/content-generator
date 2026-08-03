@@ -11,6 +11,23 @@ main { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
 
 header { margin-bottom: 32px; }
 .header-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.market-label {
+  font-size: 0.8rem; color: #555; background: #f0f0e9;
+  border: 1px solid #e6e6e0; border-radius: 20px; padding: 4px 12px; white-space: nowrap;
+}
+
+/* market chooser */
+.market-grid { display: flex; gap: 14px; margin: 16px 0 12px; flex-wrap: wrap; }
+.market-card {
+  flex: 1 1 240px; display: flex; flex-direction: column; align-items: flex-start; gap: 4px;
+  background: #fff; color: #1a1a1a; border: 1px solid #e6e6e0; border-radius: 12px;
+  padding: 20px; text-align: left;
+}
+.market-card:hover { border-color: #1a1a1a; opacity: 1; }
+.market-flag { font-size: 1.6rem; }
+.market-name { font-size: 1.05rem; font-weight: 600; }
+.market-desc { font-size: 0.86rem; color: #666; font-weight: 400; line-height: 1.45; }
 h1 { font-size: 1.6rem; }
 h2 { font-size: 1.15rem; margin-bottom: 12px; }
 .sub, .hint { color: #777; font-size: 0.88rem; }
@@ -101,3 +118,25 @@ button.delete { margin-left: auto; color: #a33; border-color: #e6c9c9; font-size
   padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin: 10px 0;
 }
 .row { display: flex; gap: 10px; }
+
+.reply-tool textarea {
+  width: 100%; margin: 8px 0; padding: 10px; border: 1px solid #ddd;
+  border-radius: 8px; font: inherit; font-size: 0.9rem;
+}
+.reply-out { margin-top: 12px; }
+
+/* X: paste-a-link fast path */
+#react-panel {
+  background: #fff; border: 1px solid #e6e6e0; border-radius: 10px;
+  padding: 16px; margin-bottom: 18px;
+}
+#react-panel textarea {
+  width: 100%; margin: 8px 0; padding: 10px; border: 1px solid #ddd;
+  border-radius: 8px; font: inherit; font-size: 0.9rem;
+}
+.or-divider { text-align: center; margin: 14px 0 0; }
+#freshness {
+  margin-top: 14px; padding: 10px 14px; border-radius: 8px;
+  background: #fdf8e8; color: #7a5c12; border: 1px solid #f0e3bb; font-size: 0.86rem;
+}
+.metrics-row input.who-engaged { width: 100%; margin-top: 8px; }

@@ -11,14 +11,52 @@
     <header>
       <div class="header-row">
         <h1>Personal Brand OS</h1>
-        <button id="btn-home" class="ghost">🏠 Home</button>
+        <div class="header-right">
+          <span id="market-label" class="market-label hidden"></span>
+          <button id="btn-home" class="ghost hidden">🏠 Home</button>
+        </div>
       </div>
       <p class="sub">Private &amp; local — nothing is shared, nothing auto-publishes.</p>
     </header>
 
+    <!-- MARKET CHOOSER (first screen) -->
+    <section id="market-chooser">
+      <h2>Which audience are you writing for?</h2>
+      <div class="market-grid">
+        <button class="market-card" data-market="india">
+          <span class="market-flag">🇮🇳</span>
+          <span class="market-name">Indian market</span>
+          <span class="market-desc">Indian consumer apps, written for PMs and founders in India.</span>
+        </button>
+        <button class="market-card" data-market="global">
+          <span class="market-flag">🌍</span>
+          <span class="market-name">Global market</span>
+          <span class="market-desc">Global brands, written mainly for US and UK product people.</span>
+        </button>
+        <button class="market-card" data-market="x">
+          <span class="market-flag">𝕏</span>
+          <span class="market-name">X (Twitter)</span>
+          <span class="market-desc">Fast takes on AI and tech news. Timely, not polished.</span>
+        </button>
+      </div>
+      <p class="hint">Each market keeps its own posts, settings and performance history.</p>
+    </section>
+
     <!-- GENERATE -->
-    <section id="generate">
+    <section id="generate" class="hidden">
+      <!-- X only: paste something you just saw and get a take -->
+      <div id="react-panel" class="hidden">
+        <h2>Saw something? Get a take.</h2>
+        <p class="hint">Paste a link, headline or a few lines you just read. Fastest path to a timely post.</p>
+        <textarea id="react-input" rows="3" placeholder="Paste a link or headline here..."></textarea>
+        <textarea id="react-observation" rows="2" placeholder="Optional — did you try it? What did you notice? (this is what makes a post yours)"></textarea>
+        <button id="btn-react">⚡ Write a take</button>
+        <p class="hint or-divider">or</p>
+      </div>
+
       <button id="btn-ideas" class="big">✨ Get content ideas</button>
+
+      <div id="freshness" class="hidden"></div>
 
       <div id="progress" class="hidden">
         <div class="spinner"></div>
@@ -44,13 +82,13 @@
     </section>
 
     <!-- HISTORY -->
-    <section id="history-section">
+    <section id="history-section" class="hidden">
       <h2>Your posts</h2>
       <div id="history-list"><p class="hint">Nothing yet — generate your first post above.</p></div>
     </section>
 
     <!-- SETTINGS -->
-    <section id="settings-section">
+    <section id="settings-section" class="hidden">
       <button id="btn-settings-toggle" class="ghost">⚙️ Settings</button>
       <div id="settings-body" class="hidden">
         <p class="hint">These are the brand rules given to the AI on every generation. Edit freely.</p>
