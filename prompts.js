@@ -408,13 +408,26 @@ const X_POST_SCHEMA = `{
   "postWithin": "e.g. 'next 3 hours' or 'today'"
 }`;
 
+// Ideas already put in front of the author that he chose not to write up.
+// Re-proposing them (or a light reword) is the fastest way to look useless.
+function skippedSection(skipped) {
+  if (!skipped?.length) return '';
+  return `
+ALREADY SUGGESTED AND PASSED OVER — the author saw every one of these and chose
+NOT to write it. Treat that as a signal he wasn't interested. Do NOT propose any
+of them again, and do NOT reword one slightly and present it as new. Where a
+company appears repeatedly below, prefer a different company entirely:
+${skipped.map((t) => `- ${t}`).join('\n')}
+`;
+}
+
 function tasteSection(tasteProfile) {
   return tasteProfile
     ? `\nLEARNED TASTE PROFILE — built from what the author has ACTUALLY posted (not just drafted). Favor ideas and styles matching this taste, while keeping enough variety to avoid repetition:\n${tasteProfile}\n`
     : '';
 }
 
-export function buildIdeasPrompt(brandRules, recentTopics, categoryCounts, tasteProfile) {
+export function buildIdeasPrompt(brandRules, recentTopics, categoryCounts, tasteProfile, skipped) {
   const dedup = recentTopics.length
     ? `\nRECENTLY COVERED TOPICS — do NOT propose anything substantially similar:\n${recentTopics.map((t) => `- ${t}`).join('\n')}\n`
     : '';
@@ -441,14 +454,14 @@ Then produce exactly 8 content ideas for LinkedIn/X posts, in this exact split:
 Count them before answering: exactly 5 must name a brand, exactly 3 must not.
 Keep every idea specific and grounded — no grand theses, no guru framing.
 Score each idea out of 10 for: originality, engagement potential, brand alignment, long-term value.
-${dedup}${rotation}${tasteSection(tasteProfile)}
+${dedup}${skippedSection(skipped)}${rotation}${tasteSection(tasteProfile)}
 Respond with ONLY a JSON object (no markdown fences, no prose) matching exactly this schema:
 ${IDEAS_SCHEMA}`;
 }
 
 // ---------- X (Twitter) ----------
 
-export function buildXIdeasPrompt(brandRules, recentTopics, tasteProfile, todayISO) {
+export function buildXIdeasPrompt(brandRules, recentTopics, tasteProfile, todayISO, skipped) {
   const dedup = recentTopics.length
     ? `\nALREADY COVERED — do not propose anything substantially similar:\n${recentTopics.map((t) => `- ${t}`).join('\n')}\n`
     : '';
@@ -474,7 +487,7 @@ Then produce exactly 10 ideas. For each:
   to pad to 10 with weak ones.
 - Score "timeliness" 0-10: how current this still is (10 = broke today and is
   still live; 3 = a week old and mostly discussed out).
-${dedup}${tasteSection(tasteProfile)}
+${dedup}${skippedSection(skipped)}${tasteSection(tasteProfile)}
 Respond with ONLY a JSON object (no markdown fences, no prose) matching exactly this schema:
 ${X_IDEAS_SCHEMA}`;
 }

@@ -79,6 +79,23 @@ function writeJson(market, name, value) {
 
 const history = (market) => readJson(market, 'content_history.json', { entries: [] });
 
+// Ideas that have already been shown. Anything here was put in front of the
+// author and not written up, so regenerating must not serve it again.
+const shownIdeas = (market) => readJson(market, 'shown_ideas.json', { topics: [] });
+
+function rememberShownIdeas(market, ideas) {
+  const cutoff = Date.now() - 30 * 24 * 3600 * 1000; // let old ones age out
+  const existing = shownIdeas(market).topics.filter((t) => new Date(t.at).getTime() > cutoff);
+  const seen = new Set(existing.map((t) => t.topic.toLowerCase()));
+  for (const idea of ideas) {
+    if (idea?.topic && !seen.has(idea.topic.toLowerCase())) {
+      existing.push({ topic: idea.topic, at: new Date().toISOString() });
+      seen.add(idea.topic.toLowerCase());
+    }
+  }
+  writeJson(market, 'shown_ideas.json', { topics: existing.slice(-120) });
+}
+
 // Build a taste profile from what the user actually posted (not just drafted).
 // Engagement metrics, when logged, promote a post to "top performer".
 function buildTasteProfile(h, market) {
@@ -303,15 +320,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/api/ideas', sseHandler(async (onProgress, market) => {
   onProgress('Reading your post history...');
   const h = history(market);
+  // Written-up posts AND ideas already shown but skipped — never repeat either.
   const recentTopics = h.entries.slice(-20).map((e) => e.topic);
+  const skipped = shownIdeas(market).topics.slice(-40).map((t) => t.topic);
   const taste = buildTasteProfile(h, market);
 
   if (market === 'x') {
     onProgress('Scanning AI launches, changelogs, HN, r/LocalLLaMA...');
     const today = new Date().toISOString().slice(0, 10);
-    const prompt = buildXIdeasPrompt(settings(market).brandRules, recentTopics, taste, today);
+    const prompt = buildXIdeasPrompt(settings(market).brandRules, recentTopics, taste, today, skipped);
     const result = await runClaude(prompt, { allowWebSearch: true, onProgress, mockResult: mockIdeas(market) });
     if (!Array.isArray(result?.ideas) || result.ideas.length === 0) throw new Error('JSON missing ideas');
+    rememberShownIdeas(market, result.ideas);
     return { ideas: result.ideas, generatedAt: new Date().toISOString() };
   }
 
@@ -319,9 +339,10 @@ app.get('/api/ideas', sseHandler(async (onProgress, market) => {
   for (const e of h.entries.slice(-20)) counts[e.category] = (counts[e.category] || 0) + 1;
   const countsStr = Object.entries(counts).map(([k, v]) => `${k}: ${v}`).join(', ');
   onProgress('Starting research across HN, Reddit, X, Product Hunt, tech blogs...');
-  const prompt = buildIdeasPrompt(settings(market).brandRules, recentTopics, countsStr, taste);
+  const prompt = buildIdeasPrompt(settings(market).brandRules, recentTopics, countsStr, taste, skipped);
   const result = await runClaude(prompt, { allowWebSearch: true, onProgress, mockResult: mockIdeas(market) });
   if (!Array.isArray(result?.ideas) || result.ideas.length === 0) throw new Error('JSON missing ideas');
+  rememberShownIdeas(market, result.ideas);
   return { ideas: result.ideas, generatedAt: new Date().toISOString() };
 }));
 
