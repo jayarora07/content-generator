@@ -247,6 +247,11 @@ async function runClaude(prompt, { allowWebSearch = false, onProgress = () => {}
       resultText = message.result || '';
     }
   }
+  // Claude can report success while the result text is actually an API error.
+  // Surface that instead of letting it fall through as a confusing parse failure.
+  if (/^\s*API Error:/i.test(resultText)) {
+    throw new Error(`api rejected the request: ${resultText.slice(0, 300)}`);
+  }
   return extractJson(resultText);
 }
 
@@ -259,10 +264,13 @@ function friendlyError(err) {
   if (/auth|login|credential|oauth|session expired|401|unauthorized/i.test(msg)) {
     return 'Your Claude login has expired. Fix: open Terminal, type "claude", press Enter, and sign in again. Then come back and retry — nothing here is lost.';
   }
-  // The SDK reports an expired login only as a bare non-zero exit, so name the
-  // most likely cause rather than showing a meaningless code.
+  if (/api rejected the request|API Error/i.test(msg)) {
+    return `Claude's API rejected the request. This is usually temporary — try again. If it keeps happening, run "npm install @anthropic-ai/claude-agent-sdk@latest" in the project folder, as an out-of-date version can cause it. (Details: ${msg.slice(0, 160)})`;
+  }
+  // A bare non-zero exit has two common causes and we can't tell them apart here,
+  // so name both rather than guessing one and sending the user down the wrong path.
   if (/exited with code|process (?:failed|exited)/i.test(msg)) {
-    return 'Claude couldn\'t start — usually this means your login has expired. Fix: open Terminal, type "claude", press Enter, and sign in again. Then retry here.';
+    return 'Claude couldn\'t complete the request. Two things to try: (1) open Terminal, type "claude", press Enter and make sure you\'re still signed in; (2) if that\'s fine, just retry — this is often temporary.';
   }
   if (/JSON|parse/i.test(msg)) {
     return 'Claude replied in an unexpected format. This happens occasionally — just click the button again.';
@@ -280,22 +288,29 @@ let activeJob = null;
 
 function sseHandler(buildPromptAndRun) {
   return async (req, res) => {
-    const market = safeMarket(req.query.market);
-    if (!market) {
-      res.status(400).json({ error: 'Pick a market first (Indian or Global).' });
-      return;
-    }
-    if (activeJob) {
-      res.status(409).json({ error: 'A generation is already running. Wait for it to finish, then try again.' });
-      return;
-    }
-    activeJob = true;
-    res.writeHead(200, {
+    // EventSource can't read a JSON body from a non-200 response — the browser
+    // just reports a dropped connection. So always open the stream and deliver
+    // problems as a 'failed' event the UI can actually show.
+    const openStream = () => res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
       Connection: 'keep-alive',
     });
     const send = (event, data) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+
+    const market = safeMarket(req.query.market);
+    if (!market) {
+      openStream();
+      send('failed', { error: 'Pick a market first, then try again.' });
+      return res.end();
+    }
+    if (activeJob) {
+      openStream();
+      send('failed', { error: 'Something else is still generating. Give it a moment and try again — only one job runs at a time.' });
+      return res.end();
+    }
+    activeJob = true;
+    openStream();
     const heartbeat = setInterval(() => res.write(': ping\n\n'), 15000);
     try {
       const result = await buildPromptAndRun((msg) => send('progress', { message: msg }), market);

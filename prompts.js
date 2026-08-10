@@ -140,10 +140,40 @@ const INDIA_RULES = `
 This content targets an Indian audience — PMs, founders, designers and operators
 in India. Write for someone who uses these apps every day.
 
-BRANDS to observe — everyday Indian consumer apps the audience actually uses:
-Rapido, Ola, Swiggy, Zomato, Zepto, Blinkit, PhonePe, Google Pay, Paytm, Zerodha,
-CRED, Groww, Meesho, Myntra, Flipkart, IRCTC, Jio, Nykaa, Dream11, plus the global
-apps Indians use heavily (WhatsApp, Instagram, YouTube, Uber, Amazon, Netflix).
+BRANDS to observe — everyday Indian apps the audience actually uses. SPREAD
+ACROSS SECTORS; do not keep returning to payments and food delivery:
+- Payments & fintech: PhonePe, Google Pay, Paytm, CRED, BHIM, Jupiter, Fi, Slice,
+  Navi, BharatPe, Razorpay, Bajaj Finserv, PolicyBazaar
+- Investing: Zerodha, Groww, Upstox, INDmoney, smallcase, Kuvera
+- Banking apps: SBI YONO, HDFC, ICICI iMobile, Kotak 811, Axis
+- Food & grocery: Swiggy, Zomato, Zepto, Blinkit, Instamart, BigBasket, Licious,
+  Country Delight, Bistro
+- Commerce: Meesho, Myntra, Flipkart, Amazon India, Nykaa, Ajio, Tata Neu, JioMart,
+  FirstCry, Lenskart, boAt, Snapdeal
+- Travel & transport: IRCTC, MakeMyTrip, ixigo, RedBus, Cleartrip, EaseMyTrip,
+  Rapido, Ola, Uber India, Namma Yatri, Chalo, Vahan/mParivahan
+- Health: Practo, Apollo 24|7, Tata 1mg, PharmEasy, Cult.fit, HealthifyMe
+- Entertainment & audio: JioHotstar, Spotify India, Pocket FM, Kuku FM, Audible
+  India, ShareChat, Moj, Josh
+- Education: Physics Wallah, Unacademy, Vedantu, Khan Academy India
+- Jobs & services: Naukri, apna, Internshala, Urban Company, NoBroker, Housing
+- Telecom & utilities: Jio, Airtel Thanks, Vi, Tata Power, electricity/DTH apps
+- Public & civic: DigiLocker, UMANG, ONDC, Bhashini, IRCTC, income-tax portal
+- Gaming & sport: Dream11, MPL, Ludo King, BGMI, WinZO
+- Global apps Indians use heavily: WhatsApp, Instagram, YouTube, Amazon, Netflix,
+  Google Maps, Truecaller
+
+DIVERSITY RULE — enforce this, it matters:
+- In any batch, EVERY product observation must name a DIFFERENT company, and they
+  should come from at least THREE different sectors above.
+- Do NOT reuse a company that appears in the recently-covered or passed-over lists
+  further down this prompt. If Google Pay, Groww or Swiggy were used recently,
+  pick from a sector you haven't touched instead.
+- Actively favour the less-written-about ones — ixigo, Practo, DigiLocker,
+  Urban Company, Pocket FM, Lenskart, Country Delight, apna, NoBroker, Naukri,
+  Physics Wallah, Namma Yatri, Tata 1mg — over the same handful of unicorns.
+- AVOID right now (reputationally noisy or defunct): Byju's, BharatPe founder
+  stories, Koo, Dunzo, and anything mid-controversy.
 
 BEST-PERFORMING ANGLE (lean toward this — it's what resonates most): small,
 almost-invisible design choices that reveal WHO the product is really built for —
@@ -452,6 +482,11 @@ Then produce exactly 8 content ideas for LinkedIn/X posts, in this exact split:
   cancel"; write "<real product> offers pause instead of cancel — here's the call".
 - IDEAS 6-8 are the broader product/AI themes, not tied to a specific company.
 Count them before answering: exactly 5 must name a brand, exactly 3 must not.
+CHECK THE COMPANIES BEFORE YOU ANSWER: the 5 brands must be 5 DIFFERENT companies,
+drawn from at least three different sectors, and none may repeat a company already
+named in the covered/passed-over lists above. If your draft has two from the same
+sector or reuses a recent company, replace it with one from a sector you haven't
+used — there is a long list to choose from and the obvious names are overused.
 Keep every idea specific and grounded — no grand theses, no guru framing.
 Score each idea out of 10 for: originality, engagement potential, brand alignment, long-term value.
 ${dedup}${skippedSection(skipped)}${rotation}${tasteSection(tasteProfile)}
