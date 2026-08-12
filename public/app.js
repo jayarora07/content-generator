@@ -456,12 +456,49 @@ async function loadHistory() {
 
 // ---------- Settings ----------
 
+// Let you switch AI engine, so the app isn't tied to one provider.
+async function loadEngines() {
+  const list = $('engine-list');
+  list.innerHTML = '<p class="hint">Checking what\'s installed...</p>';
+  try {
+    const { engines, current } = await (await fetch('/api/engines')).json();
+    list.innerHTML = '';
+    engines.forEach((e) => {
+      const row = document.createElement('label');
+      row.className = 'engine-row' + (e.available ? '' : ' unavailable');
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'engine';
+      radio.value = e.id;
+      radio.checked = e.id === current;
+      radio.disabled = !e.available;
+      radio.addEventListener('change', async () => {
+        await fetch('/api/engines', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ engine: e.id }),
+        });
+        $('settings-status').textContent = `Now using ${e.label} ✓`;
+        setTimeout(() => ($('settings-status').textContent = ''), 2500);
+      });
+      const text = document.createElement('span');
+      text.innerHTML = `<strong>${esc(e.label)}</strong>${e.webSearch ? '' : ' <em>— can\'t search the web</em>'}<br><span class="hint">${esc(e.note)}</span>`;
+      row.appendChild(radio);
+      row.appendChild(text);
+      list.appendChild(row);
+    });
+  } catch {
+    list.innerHTML = '<p class="hint">Could not check engines.</p>';
+  }
+}
+
 $('btn-settings-toggle').addEventListener('click', async () => {
   const body = $('settings-body');
   if (body.classList.contains('hidden')) {
     const r = await fetch(withMarket('/api/settings'));
     $('brand-rules').value = (await r.json()).brandRules;
     show(body);
+    loadEngines();
   } else {
     hide(body);
   }

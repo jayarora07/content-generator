@@ -1,3 +1,8 @@
 node_modules/
-data/
 .DS_Store
+
+# Your posts and settings ARE committed, so they travel with the repo.
+# Only the throwaway files the app writes alongside them are ignored.
+data/**/*.bak
+data/**/*.tmp
+data/**/*.migrated

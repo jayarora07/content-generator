@@ -91,7 +91,11 @@
     <section id="settings-section" class="hidden">
       <button id="btn-settings-toggle" class="ghost">⚙️ Settings</button>
       <div id="settings-body" class="hidden">
-        <p class="hint">These are the brand rules given to the AI on every generation. Edit freely.</p>
+        <h3 class="settings-heading">AI engine</h3>
+        <p class="hint">Which AI this app talks to. It uses whatever you're already signed in to — no API keys.</p>
+        <div id="engine-list"></div>
+        <h3 class="settings-heading">Brand rules</h3>
+        <p class="hint">These are the rules given to the AI on every generation. Edit freely.</p>
         <textarea id="brand-rules" rows="16"></textarea>
         <div class="row">
           <button id="btn-save-settings">Save</button>

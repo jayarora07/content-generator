@@ -140,3 +140,16 @@ button.delete { margin-left: auto; color: #a33; border-color: #e6c9c9; font-size
   background: #fdf8e8; color: #7a5c12; border: 1px solid #f0e3bb; font-size: 0.86rem;
 }
 .metrics-row input.who-engaged { width: 100%; margin-top: 8px; }
+
+/* settings: engine picker */
+.settings-heading { font-size: 0.95rem; margin: 18px 0 4px; }
+.settings-heading:first-child { margin-top: 4px; }
+.engine-row {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 10px 12px; margin-bottom: 8px;
+  background: #fff; border: 1px solid #e6e6e0; border-radius: 8px;
+  font-size: 0.9rem; cursor: pointer;
+}
+.engine-row.unavailable { opacity: 0.55; cursor: default; }
+.engine-row input { margin-top: 3px; }
+.engine-row em { color: #a07807; font-style: normal; font-size: 0.85rem; }

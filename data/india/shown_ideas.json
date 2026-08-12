@@ -1,0 +1,484 @@
+{
+  "topics": [
+    {
+      "topic": "Groww Shows 'SIP Amount' Without Context — And That's Probably a Trade-Off",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "Uber India's 'Upfront Tipping' Flips the Usual Reward Timing",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "IRCTC's New Site Keeps a 'Switch to Old Version' Link",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "Amazon India's Rufus Accepts Prompts Like 'Summer Outfits Under ₹5000'",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "Nykaa Now Promises 30-120 Minute Delivery — Not 10",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "When UPI Apps Started Showing Bank-Registered Names Instead of Nicknames",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "The Hardest Part of AI Feature Adoption Isn't the Feature — It's the Setup Screen",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "Why More Trust Signals Sometimes Mean Less Trust",
+      "at": "2026-08-10T06:42:15.656Z"
+    },
+    {
+      "topic": "Zomato's Healthy Score Shows AI Confidence Alongside Every Dish — Not Hidden in Settings",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "Rapido's Power Pass Analyzes Your Rides Before Offering You a Subscription — Not After",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "Uber's 'Record My Ride' Gives Control to Drivers, Not Riders — And Deletes Footage if Nothing Happens",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "Myntra's M-Now Promises 30-Minute Fashion Delivery — Not 10",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "PhonePe Protect Blocks 'Very High Risk' Payments Entirely — But Only Warns You on 'Medium Risk'",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "When AI Handles the Research, Users Still Need to Make the Call",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "Complexity Is the Real Adoption Barrier for AI Features",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "The Shift From 'How Many Users Clicked' to 'What Did the Business Get Back'",
+      "at": "2026-08-10T17:12:06.092Z"
+    },
+    {
+      "topic": "Zepto Shows Real-Time Photos of Your Produce — Not Stock Images",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "Uber India's 'Don't Type & Drive' Blocks Keyboard Access When the Car is Moving",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "Rapido Added Tamil Language Support — But Only for Some Screens",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "WhatsApp Business Now Lets You Run the App and API on the Same Number",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "Dream11 Removed Real-Money Contests — But Kept the Exact Same Game Mechanics",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "Why the Best AI Features in 2026 Are the Ones You Barely Notice",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "The Trust Gap: Most People Use AI Regularly But Less Than Half Actually Trust It",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "The Fastest Growing Segment in Indian Ride-Hailing Isn't Cars — It's Electric Bikes in Tier-2 Cities",
+      "at": "2026-08-10T17:17:31.647Z"
+    },
+    {
+      "topic": "Google Pay's 'Pocket Money' Uses Language Parents Already Know — Not Fintech Jargon",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "Zerodha Moved Risk Warnings From Pop-Ups to In-Window Icons — And That's a Product Call",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "Shopsy's AI Search Accepts Instagram Reels as Input — Not Just Keywords",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "IRCTC's New Website Shows Seat Availability Inside the Date Picker — Not After You Click",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "Myntra Explains Why a Size Works for You — Not Just Which Size to Pick",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "When AI Features Work in Ten Languages, Adoption Becomes a Distribution Problem — Not a Product One",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "The Hardest Part of Scaling AI in Product Teams Isn't the Model — It's Replicating What Super Users Figured Out",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "AI Agents Need Permission Boundaries — And Most PMs Haven't Thought About Where Those Lines Are",
+      "at": "2026-08-10T17:34:51.065Z"
+    },
+    {
+      "topic": "Blinkit Bistro Puts Food Next to Groceries — In the Same Dark Store",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "Flipkart Minutes Is Spinning Off Into Its Own App — Not Staying Embedded",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "Uber India Encrypts Audio Recordings on the User's Device — Not Their Servers",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "IRCTC's New Site Shows Seat Availability Inside the Class Selector — Not After You Pick",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "Zomato's District App Shows Accessibility Certifications for Restaurants — Before You Book",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "Why Manual Override Is the Most Underrated AI Feature",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "The Best AI Features Reveal Themselves When You Need Them — Not During Onboarding",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "Graceful Failure Is the Difference Between AI Features That Build Trust and Ones That Destroy It",
+      "at": "2026-08-10T18:01:09.474Z"
+    },
+    {
+      "topic": "Groww Shows Your First SIP as a Celebration Screen — Not Just a Confirmation",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "PhonePe UPI Lite Doesn't Show Transactions in Your Bank Statement — By Design",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "CRED's Dark Theme Isn't Just Aesthetic — It Signals 'Premium' Without Saying It",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "Google Pay's 'Ask Google Pay' Accepts Questions in 10 Indian Languages — Not Just English",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "Flipkart Found That 95% of Users Who Switch to a Regional Language Interface Never Switch Back",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "Why the First Screen After Onboarding Matters More Than Onboarding Itself",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "The Shift From 'Did Users Click' to 'Did the Task Get Done'",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "Why 'Agent-Readiness' Is Becoming a Factor in B2B Product Adoption",
+      "at": "2026-08-10T18:09:44.283Z"
+    },
+    {
+      "topic": "Groww Shows Your SIP Amount as a Celebration Before You Confirm — Not After",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "Zepto Cafe Prepares Food Inside the Same Dark Store That Holds Your Groceries — Not a Separate Kitchen",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "WhatsApp Business AI in India Requires Permission Before Every Task — Not Just at Setup",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "Rapido Shows Captain Distance and Live Traffic on the Tracking Screen — Not Just ETA",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "Swiggy Instamart's Private Label 'Noice' Uses Bright Packaging Designed for Thumbnails — Not Shelves",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "When AI Handles the Suggestion, Users Still Need to Feel Like They Chose",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "The Hardest Part of AI Personalization Isn't the Model — It's Knowing When to Stay Quiet",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "Why Products That Remove Decisions Outperform Products That Add Options",
+      "at": "2026-08-10T18:16:08.539Z"
+    },
+    {
+      "topic": "DigiLocker Keeps 'Issued' and 'Uploaded' as Two Separate Sections — And Won't Merge Them",
+      "at": "2026-08-10T18:43:32.232Z"
+    },
+    {
+      "topic": "ixigo Tells You Your Waitlisted Ticket Might Not Confirm — Before You Pay for It",
+      "at": "2026-08-10T18:43:32.233Z"
+    },
+    {
+      "topic": "apna Screens Job Candidates by Calling Them in Hindi — Instead of Asking Them to Fill a Form",
+      "at": "2026-08-10T18:43:32.233Z"
+    },
+    {
+      "topic": "Pocket FM Shows a Countdown Timer Next to a Locked Episode — You Can Pay, or You Can Wait",
+      "at": "2026-08-10T18:43:32.233Z"
+    },
+    {
+      "topic": "Tata 1mg Puts the Cheaper Substitute on the Same Page as the Branded Medicine",
+      "at": "2026-08-10T18:43:32.233Z"
+    },
+    {
+      "topic": "People Use the AI Answer, Then Go Check It Somewhere Else — Nobody Designs for That Second Step",
+      "at": "2026-08-10T18:43:32.233Z"
+    },
+    {
+      "topic": "The Blank Text Box Is the Hardest Empty State Product Teams Have Faced in Years",
+      "at": "2026-08-10T18:43:32.233Z"
+    },
+    {
+      "topic": "When an AI Feature Misses, Users Blame Themselves — So the Failure Never Reaches You",
+      "at": "2026-08-10T18:43:32.233Z"
+    },
+    {
+      "topic": "Airtel Flags Spam Calls at the Network Level — You Never Install Anything",
+      "at": "2026-08-10T18:50:14.523Z"
+    },
+    {
+      "topic": "FirstCry Runs Your Child's Vaccination Calendar Inside a Shopping App",
+      "at": "2026-08-10T18:50:14.524Z"
+    },
+    {
+      "topic": "Country Delight Lets You Skip Tomorrow's Milk by Tapping a Date",
+      "at": "2026-08-10T18:50:14.524Z"
+    },
+    {
+      "topic": "Chalo Is a Bus App Whose Most Important Product Is a Plastic Card",
+      "at": "2026-08-10T18:50:14.524Z"
+    },
+    {
+      "topic": "Physics Wallah Now Sells Exam Prep by the Month, Priced Like a Streaming Plan",
+      "at": "2026-08-10T18:50:14.524Z"
+    },
+    {
+      "topic": "One Phone, Four People — And the Product Thinks It's Talking to One",
+      "at": "2026-08-10T18:50:14.524Z"
+    },
+    {
+      "topic": "People Trust an AI Answer More When They Watch It Work",
+      "at": "2026-08-10T18:50:14.524Z"
+    },
+    {
+      "topic": "AI Products Are Drifting From 'Per Person' Pricing to 'Per Task'",
+      "at": "2026-08-10T18:50:14.524Z"
+    },
+    {
+      "topic": "Zerodha Warns You About a Stock on the Very Screen Where You Buy It",
+      "at": "2026-08-10T18:59:51.321Z"
+    },
+    {
+      "topic": "redBus Tells You How Many Single Seats Are Left — Not Just How Many Seats",
+      "at": "2026-08-10T18:59:51.323Z"
+    },
+    {
+      "topic": "Cult.fit Waives Your No-Show Penalty If Someone Else Takes the Slot You Dropped",
+      "at": "2026-08-10T18:59:51.323Z"
+    },
+    {
+      "topic": "Urban Company Makes the Professional Take a Selfie at Your Door Before the Job Starts",
+      "at": "2026-08-10T18:59:51.323Z"
+    },
+    {
+      "topic": "Google Maps Describes Indian Addresses by Landmarks — Not Just Street Names",
+      "at": "2026-08-10T18:59:51.323Z"
+    },
+    {
+      "topic": "Research Teams Let AI Into Everything Except the Participant's Chair",
+      "at": "2026-08-10T18:59:51.323Z"
+    },
+    {
+      "topic": "People Are Starting to Ask for One Answer Instead of a List of Ten",
+      "at": "2026-08-10T18:59:51.323Z"
+    },
+    {
+      "topic": "An AI Feature That Sounds Too Sure Gets Checked Less — and That's a Design Problem",
+      "at": "2026-08-10T18:59:51.323Z"
+    },
+    {
+      "topic": "Truecaller Now Lets You End a Scam Call Happening on Your Parent's Phone",
+      "at": "2026-08-10T19:23:08.072Z"
+    },
+    {
+      "topic": "Lenskart Charges a Small Fee to Book Its Free Home Eye Test — and Adjusts It Against Your Order",
+      "at": "2026-08-10T19:23:08.073Z"
+    },
+    {
+      "topic": "HealthifyMe Lets You Photograph the Meal Now and Log It Hours Later",
+      "at": "2026-08-10T19:23:08.073Z"
+    },
+    {
+      "topic": "Naukri Added a 'Career Break' Field So a Gap Stops Looking Like a Mistake",
+      "at": "2026-08-10T19:23:08.073Z"
+    },
+    {
+      "topic": "Policybazaar Staffs the Claim — the Part That Happens Long After It Gets Paid",
+      "at": "2026-08-10T19:23:08.073Z"
+    },
+    {
+      "topic": "Teams Are Quietly Taking the Word 'AI' Out of Feature Names",
+      "at": "2026-08-10T19:23:08.073Z"
+    },
+    {
+      "topic": "The Open-Text Answer in Your Survey May Not Be in the User's Own Words Anymore",
+      "at": "2026-08-10T19:23:08.073Z"
+    },
+    {
+      "topic": "India Is Getting Paid AI Plans for Free Right Now — the Real Product Test Comes When the Free Year Ends",
+      "at": "2026-08-10T19:23:08.073Z"
+    },
+    {
+      "topic": "Flipkart Opens the Box at Your Door — and the OTP Comes After You Inspect, Not Before",
+      "at": "2026-08-10T19:45:50.362Z"
+    },
+    {
+      "topic": "Practo Only Lets You Rate a Doctor If Practo Booked the Appointment",
+      "at": "2026-08-10T19:45:50.364Z"
+    },
+    {
+      "topic": "JioHotstar Put Someone Else's Brand Name Inside Its Own App",
+      "at": "2026-08-10T19:45:50.364Z"
+    },
+    {
+      "topic": "Vi Saves Your Unused Weekday Data for the Weekend — Then Lets It Expire on Sunday Night",
+      "at": "2026-08-10T19:45:50.364Z"
+    },
+    {
+      "topic": "INDmoney's Most-Loved Feature Shows You Money It Doesn't Earn Anything On",
+      "at": "2026-08-10T19:45:50.364Z"
+    },
+    {
+      "topic": "Undo Is Quietly Becoming the Most Important Button in AI Products",
+      "at": "2026-08-10T19:45:50.364Z"
+    },
+    {
+      "topic": "The Competitor People Name in Interviews Isn't on Anyone's Competitor List",
+      "at": "2026-08-10T19:45:50.364Z"
+    },
+    {
+      "topic": "Forgetting Has Started to Read as a Bug",
+      "at": "2026-08-10T19:45:50.364Z"
+    },
+    {
+      "topic": "PhonePe Lets You Hand Your UPI to Someone Who Doesn't Have a Bank Account",
+      "at": "2026-08-10T19:56:42.068Z"
+    },
+    {
+      "topic": "Apollo 24|7 Keeps the Chat Open for a Week After Your Consultation Ends",
+      "at": "2026-08-10T19:56:42.069Z"
+    },
+    {
+      "topic": "Spotify Sells a One-Day Subscription in India — and Deliberately Doesn't Auto-Renew It",
+      "at": "2026-08-10T19:56:42.069Z"
+    },
+    {
+      "topic": "Amazon Bazaar Is a Store Organised by Price, Not by Category",
+      "at": "2026-08-10T19:56:42.069Z"
+    },
+    {
+      "topic": "MakeMyTrip Sells You the Right to Change Your Mind — at the Exact Moment You're Least Sure",
+      "at": "2026-08-10T19:56:42.069Z"
+    },
+    {
+      "topic": "The 'Talk to a Human' Button Is What Makes People Willing to Use the Bot",
+      "at": "2026-08-10T19:56:42.069Z"
+    },
+    {
+      "topic": "Most People Didn't Abandon the Cart — They Were Interrupted, or Using It as a Bookmark",
+      "at": "2026-08-10T19:56:42.069Z"
+    },
+    {
+      "topic": "The AI People Actually Use Is the Kind They Never Had to Open",
+      "at": "2026-08-10T19:56:42.069Z"
+    },
+    {
+      "topic": "ixigo Turns 'Waitlist 23' Into a Confirmation Percentage — Because Nobody Knows What WL 23 Means",
+      "at": "2026-08-11T06:36:17.598Z"
+    },
+    {
+      "topic": "Pocket FM Lets You Unlock the Next Episode With Time, Attention, or Money — and Shows All Three Side by Side",
+      "at": "2026-08-11T06:36:17.599Z"
+    },
+    {
+      "topic": "DigiLocker Doesn't Actually Keep Your Documents — It Keeps a Pointer to Them",
+      "at": "2026-08-11T06:36:17.599Z"
+    },
+    {
+      "topic": "Tata 1mg Shows You a Cheaper Substitute on the Page Where You're About to Buy the Expensive One",
+      "at": "2026-08-11T06:36:17.599Z"
+    },
+    {
+      "topic": "smallcase Never Rebalances Your Portfolio For You — It Waits for Two Taps",
+      "at": "2026-08-11T06:36:17.599Z"
+    },
+    {
+      "topic": "People Say More to an Interviewer Who Can't Judge Them",
+      "at": "2026-08-11T06:36:17.599Z"
+    },
+    {
+      "topic": "The AI Indians Use Most May Be the One That Replaces Typing, Not the One That Answers Questions",
+      "at": "2026-08-11T06:36:17.599Z"
+    },
+    {
+      "topic": "Shipping a Better Version Can Land as Taking Something Away",
+      "at": "2026-08-11T06:36:17.599Z"
+    },
+    {
+      "topic": "Chalo Tells You How Full the Bus Is Before It Reaches Your Stop",
+      "at": "2026-08-11T14:21:00.728Z"
+    },
+    {
+      "topic": "apna Ends a Job Application by Telling You to Call the Recruiter Yourself",
+      "at": "2026-08-11T14:21:00.740Z"
+    },
+    {
+      "topic": "Nykaa Makes You Pick Your Own Free Samples in the Cart",
+      "at": "2026-08-11T14:21:00.743Z"
+    },
+    {
+      "topic": "Country Delight Lets You Change Tomorrow's Milk Order Until Just Before Midnight",
+      "at": "2026-08-11T14:21:00.743Z"
+    },
+    {
+      "topic": "Physics Wallah's AI Doubt Solver Answers With a Teacher's Video, Not Just Text",
+      "at": "2026-08-11T14:21:00.743Z"
+    },
+    {
+      "topic": "The Three Example Prompts Under the Text Box Are the Real Onboarding",
+      "at": "2026-08-11T14:21:00.743Z"
+    },
+    {
+      "topic": "People Test a New AI Feature With a Question They Already Know the Answer To",
+      "at": "2026-08-11T14:21:00.743Z"
+    },
+    {
+      "topic": "Your Product's First Impression Now Happens in a Summary You Didn't Write",
+      "at": "2026-08-11T14:21:00.743Z"
+    }
+  ]
+}

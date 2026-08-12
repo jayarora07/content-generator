@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { fileURLToPath } from 'url';
+import { ENGINE_IDS, getEngine, detectEngines, pickDefaultEngine } from './engines.js';
 import {
   DEFAULT_RULES, MARKETS,
   buildIdeasPrompt, buildPostsPrompt, buildReplyPrompt,
@@ -214,40 +215,26 @@ function extractJson(text) {
   return JSON.parse(cleaned.slice(start, end + 1));
 }
 
+// Which AI engine to use. Stored outside the per-market folders because it's a
+// property of this machine, not of the content.
+const engineConfig = () => readJson('.', 'engine.json', { engine: null });
+const setEngineConfig = (engine) => writeJson('.', 'engine.json', { engine });
+
+async function currentEngineId() {
+  const saved = engineConfig().engine;
+  if (saved && ENGINE_IDS.includes(saved)) return saved;
+  return pickDefaultEngine();
+}
+
 async function runClaude(prompt, { allowWebSearch = false, onProgress = () => {}, mockResult } = {}) {
   if (MOCK) {
     onProgress('Using mock data (MOCK_CLAUDE=1)...');
     await new Promise((r) => setTimeout(r, 1500));
     return mockResult;
   }
-  const { query } = await import('@anthropic-ai/claude-agent-sdk');
-  let resultText = '';
-  const q = query({
-    prompt,
-    options: {
-      allowedTools: allowWebSearch ? ['WebSearch', 'WebFetch'] : [],
-      permissionMode: 'bypassPermissions',
-      maxTurns: 30,
-    },
-  });
-  for await (const message of q) {
-    if (message.type === 'assistant') {
-      for (const block of message.message?.content || []) {
-        if (block.type === 'tool_use' && (block.name === 'WebSearch' || block.name === 'WebFetch')) {
-          const target = block.input?.query || block.input?.url || '';
-          onProgress(`Researching: ${String(target).slice(0, 80)}`);
-        } else if (block.type === 'text') {
-          onProgress('Thinking...');
-        }
-      }
-    } else if (message.type === 'result') {
-      if (message.subtype !== 'success') {
-        throw new Error(message.subtype === 'error_max_turns' ? 'research ran too long' : 'Claude returned an error');
-      }
-      resultText = message.result || '';
-    }
-  }
-  // Claude can report success while the result text is actually an API error.
+  const engine = getEngine(await currentEngineId());
+  const resultText = await engine.run({ prompt, allowWebSearch, onProgress });
+  // An engine can report success while the text is actually an error message.
   // Surface that instead of letting it fall through as a confusing parse failure.
   if (/^\s*API Error:/i.test(resultText)) {
     throw new Error(`api rejected the request: ${resultText.slice(0, 300)}`);
@@ -536,6 +523,17 @@ app.delete('/api/history/:id', (req, res) => {
   h.entries.splice(idx, 1);
   writeJson(market, 'content_history.json', h);
   res.json({ ok: true });
+});
+
+// Engine — which AI this machine talks to. Not market-specific.
+app.get('/api/engines', async (req, res) => {
+  res.json({ engines: await detectEngines(), current: await currentEngineId() });
+});
+app.put('/api/engines', async (req, res) => {
+  const engine = req.body?.engine;
+  if (!ENGINE_IDS.includes(engine)) return res.status(400).json({ error: 'Unknown engine.' });
+  setEngineConfig(engine);
+  res.json({ ok: true, current: engine });
 });
 
 // Settings — each market has its own independently editable rules.
