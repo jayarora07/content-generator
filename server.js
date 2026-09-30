@@ -47,7 +47,16 @@ for (const m of MARKETS) fs.mkdirSync(path.join(DATA_DIR, m), { recursive: true 
     if (!fs.existsSync(file)) continue;
     try {
       const saved = JSON.parse(fs.readFileSync(file, 'utf8'));
-      if (!String(saved.brandRules || '').includes('MARKET FOCUS')) {
+      const savedRules = String(saved.brandRules || '');
+      const needsMarketUpgrade = !savedRules.includes('MARKET FOCUS');
+      const needsAllBreakdownsUpgrade = m !== 'x' && (
+        savedRules.includes('TWO KINDS OF POSTS') ||
+        savedRules.includes('5 of every 8 ideas') ||
+        savedRules.includes('5 of type 1, 3 of type 2')
+      );
+      const needsFameMixRefresh = m === 'global' &&
+        /FAME MIX[\s\S]*Uber, Amazon,\s*Instagram/.test(savedRules);
+      if (needsMarketUpgrade || needsAllBreakdownsUpgrade || needsFameMixRefresh) {
         const tmp = file + '.tmp';
         fs.copyFileSync(file, file + '.bak');
         fs.writeFileSync(tmp, JSON.stringify({ brandRules: DEFAULT_RULES[m] }, null, 2));

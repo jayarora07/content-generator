@@ -296,7 +296,9 @@ function buildEntryDetails(e) {
   const d = e.drafts || {};
   const details = document.createElement('details');
   const summary = document.createElement('summary');
-  summary.textContent = isX()
+  summary.textContent = e.status === 'idea'
+    ? 'View idea and sources'
+    : isX()
     ? 'View everything (post, openings, replies...)'
     : 'View everything (posts, hooks, comments...)';
   details.appendChild(summary);
@@ -308,6 +310,15 @@ function buildEntryDetails(e) {
   details.addEventListener('toggle', () => {
     if (!details.open || rendered) return;
     rendered = true;
+    if (e.status === 'idea') {
+      if (e.idea?.whyItMatters) {
+        body.appendChild(block('Why it matters', `<p>${esc(e.idea.whyItMatters)}</p>`));
+      }
+      if (e.idea?.sources?.length) {
+        body.appendChild(block('Research sources', `<ul>${e.idea.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join('')}</ul>`));
+      }
+      return;
+    }
     if ((e.market || market) === 'x') {
       renderXBlocks(body, e);
       body.appendChild(buildReplyTool(e.id));
@@ -390,19 +401,29 @@ async function loadHistory() {
     item.className = 'history-item';
     const date = new Date(e.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
     const m = e.metrics || {};
+    const statusClass = e.status === 'posted' ? 'posted' : e.status === 'idea' ? 'idea' : 'draft';
+    const statusText = e.status === 'posted' ? '✓ Posted' : e.status === 'idea' ? 'Idea' : 'Draft';
     item.innerHTML = `
       <div class="top">
         <div>
           <strong>${esc(e.topic)}</strong>
           <div class="meta">${date} · ${esc(e.category || '')}</div>
         </div>
-        <span class="status-${e.status === 'posted' ? 'posted' : 'draft'}">${e.status === 'posted' ? '✓ Posted' : 'Draft'}</span>
+        <span class="status-${statusClass}">${statusText}</span>
       </div>
     `;
     item.appendChild(buildEntryDetails(e));
     const row = document.createElement('div');
     row.className = 'metrics-row';
-    if (e.status !== 'posted') {
+    if (e.status === 'idea') {
+      const btn = document.createElement('button');
+      btn.textContent = 'Write this one →';
+      btn.addEventListener('click', () => {
+        writePosts(e.idea);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      row.appendChild(btn);
+    } else if (e.status !== 'posted') {
       const btn = document.createElement('button');
       btn.className = 'ghost';
       btn.textContent = 'Mark as posted';

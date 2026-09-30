@@ -102,6 +102,7 @@ button:disabled { opacity: 0.4; cursor: default; }
 .history-item .meta { font-size: 0.78rem; color: #999; margin-top: 2px; }
 .history-item .status-posted { color: #2c6e2c; font-size: 0.8rem; }
 .history-item .status-draft { color: #a07807; font-size: 0.8rem; }
+.history-item .status-idea { color: #315f9f; font-size: 0.8rem; }
 .history-item details { margin-top: 10px; font-size: 0.88rem; }
 .history-item summary { cursor: pointer; color: #666; font-size: 0.82rem; }
 .metrics-row { display: flex; gap: 8px; margin-top: 10px; align-items: center; flex-wrap: wrap; }

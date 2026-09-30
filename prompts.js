@@ -37,9 +37,9 @@ AI Products, Product Thinking, Systems Thinking, User Research,
 Startup Execution (general lessons only, never personal), Automation,
 Human Behaviour, Future of Work.
 
-TWO KINDS OF POSTS — mix them (each batch is 8 ideas: 5 of type 1, 3 of type 2):
-1. PRODUCT OBSERVATIONS (5 of every 8 ideas) — a real, specific thing a real
-   company or app does, and the product thinking behind it.
+CONTENT FORMAT — every batch contains 8 PRODUCT BREAKDOWNS. Every idea examines
+   a real, specific thing a real company or app does, and the product thinking
+   behind it.
    Pick ONE concrete detail — a flow, a default, a piece of copy, an empty state,
    a permission prompt, a pricing choice, a notification — and reason about WHY
    they might have designed it that way and the trade-off involved. These are your
@@ -64,13 +64,11 @@ TWO KINDS OF POSTS — mix them (each batch is 8 ideas: 5 of type 1, 3 of type 2
    something everyone already says — DISCARD it and find a sharper one. Do not pad
    the list with weak ideas just to reach the count.
    The pattern that works: one product, one tiny concrete detail, a surprising "why".
-2. IDEAS / THEMES (3 of every 8 ideas) — a broader product or AI-in-product
-   observation from the pillars above (product thinking, AI in products, user
-   research, human behaviour). Still grounded and specific, never a grand thesis.
 
-TOPIC MIX across posts: 5 of every 8 ideas are product observations of real
-companies/apps, the other 3 are broader product/AI themes. Rotate companies —
-don't repeat the same product in consecutive batches.
+TOPIC MIX across posts: all 8 ideas are product breakdowns of real companies/apps.
+Broader product, AI, research, or behaviour themes may be used only as the LENS
+through which a named product is examined; never return a standalone theme. Use
+8 different companies and do not repeat the same product in consecutive batches.
 
 TOPIC RESTRICTIONS — the author is a PRODUCT MANAGER, not an engineer:
 - NEVER propose or write about coding, programming, code generation, code review,
@@ -166,12 +164,16 @@ ACROSS SECTORS; do not keep returning to payments and food delivery:
 DIVERSITY RULE — enforce this, it matters:
 - In any batch, EVERY product observation must name a DIFFERENT company, and they
   should come from at least THREE different sectors above.
+- Include at least THREE household-name brands in every batch (for example
+  WhatsApp, YouTube, Amazon, Netflix, Google Maps, PhonePe, Swiggy, Zomato,
+  Flipkart or MakeMyTrip). Use quieter, less-obvious product details from those
+  famous brands rather than their headline features.
 - Do NOT reuse a company that appears in the recently-covered or passed-over lists
   further down this prompt. If Google Pay, Groww or Swiggy were used recently,
   pick from a sector you haven't touched instead.
-- Actively favour the less-written-about ones — ixigo, Practo, DigiLocker,
-  Urban Company, Pocket FM, Lenskart, Country Delight, apna, NoBroker, Naukri,
-  Physics Wallah, Namma Yatri, Tata 1mg — over the same handful of unicorns.
+- Balance household names with less-written-about products such as ixigo, Practo,
+  DigiLocker, Urban Company, Pocket FM, Lenskart, Country Delight, apna,
+  NoBroker, Naukri, Physics Wallah, Namma Yatri and Tata 1mg.
 - AVOID right now (reputationally noisy or defunct): Byju's, BharatPe founder
   stories, Koo, Dunzo, and anything mid-controversy.
 
@@ -228,6 +230,11 @@ overused example in all of product content), Spotify Wrapped, Netflix's skip-int
 Amazon 1-click, Airbnb's cereal boxes, Figma's multiplayer cursors, Superhuman's
 PMF survey, Tinder's swipe, Instagram Stories, Gmail's undo send. If the detail is
 the brand's headline feature, find a smaller, quieter surface instead.
+
+FAME MIX — every batch must include at least THREE globally famous, household-name
+companies from the SAFE list (for example Spotify, Netflix, Airbnb, Uber,
+Instagram, IKEA, Notion, Slack or Canva). Pair them with less-covered brands for
+variety. Famous is encouraged; cliché product details are not.
 
 ANGLES — these are LENSES to examine a NAMED product through, never standalone
 topics. Always attach one to a real brand. The loaded constraints for US/UK
@@ -468,10 +475,11 @@ export function buildIdeasPrompt(brandRules, recentTopics, categoryCounts, taste
 
 TASK: Research from the past month or so (recency is nice but insight matters more). Use web search to look at:
 - What the products listed in the MARKET FOCUS section above have recently shipped, changed, or are known for doing in a specific, noticeable way. Use ONLY brands appropriate to that market.
-- Broader product and AI-in-product discussions.
+- Broader product and AI-in-product discussions that can serve as a lens for a
+  breakdown of a named product.
 
-Then produce exactly 8 content ideas for LinkedIn/X posts, in this exact split:
-- IDEAS 1-5 MUST BE PRODUCT OBSERVATIONS. Each one MUST name a real, specific
+Then produce exactly 8 content ideas for LinkedIn/X posts. ALL 8 MUST BE PRODUCT
+BREAKDOWNS. Each one MUST name a real, specific
   company or app IN ITS TITLE, and point at ONE concrete product detail (a flow,
   default, copy choice, notification, empty state, permission prompt, pricing move)
   with a curious take on the thinking behind it. An idea that does not name a real
@@ -480,13 +488,17 @@ Then produce exactly 8 content ideas for LinkedIn/X posts, in this exact split:
   The "angles" listed in MARKET FOCUS are LENSES to look at a named product
   through — they are NOT standalone topics. E.g. don't write "why pause beats
   cancel"; write "<real product> offers pause instead of cancel — here's the call".
-- IDEAS 6-8 are the broader product/AI themes, not tied to a specific company.
-Count them before answering: exactly 5 must name a brand, exactly 3 must not.
-CHECK THE COMPANIES BEFORE YOU ANSWER: the 5 brands must be 5 DIFFERENT companies,
+- Do not return any standalone product/AI theme. Attach every theme to a named
+  company and a verifiable product choice.
+Count them before answering: exactly 8 ideas, and all 8 must name a brand.
+CHECK THE COMPANIES BEFORE YOU ANSWER: the 8 brands must be 8 DIFFERENT companies,
 drawn from at least three different sectors, and none may repeat a company already
 named in the covered/passed-over lists above. If your draft has two from the same
 sector or reuses a recent company, replace it with one from a sector you haven't
 used — there is a long list to choose from and the obvious names are overused.
+At least THREE of the 8 must be famous household-name companies identified in the
+MARKET FOCUS. Use non-obvious details from those famous products so the ideas feel
+fresh rather than recycled.
 Keep every idea specific and grounded — no grand theses, no guru framing.
 Score each idea out of 10 for: originality, engagement potential, brand alignment, long-term value.
 ${dedup}${skippedSection(skipped)}${rotation}${tasteSection(tasteProfile)}
